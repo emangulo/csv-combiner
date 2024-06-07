@@ -1,7 +1,8 @@
 // User inputs:
+const nameFilter = "Jobs"; // "" or JobFilters or Jobs
+
 const inputFolder = "./input"; // set to input folder
-const outputFile = "./output/output.csv"; // set to output file name
-const nameFilter = ""; // "" or JobFilters or Jobs
+const outputFile = `./output/output-${nameFilter}.csv`; // set to output file name
 
 // Program start. DO NOT MODIFY
 
