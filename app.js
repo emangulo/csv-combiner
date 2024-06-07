@@ -23,7 +23,7 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
   return arrayOfFiles;
 }
 
-function combineTextFiles(inputFolder, outputFile, nameFilter) {
+async function combineTextFiles(inputFolder, outputFile, nameFilter) {
   const allFiles = getAllFiles(inputFolder);
   const textFiles = allFiles.filter(
     (file) =>
@@ -40,48 +40,37 @@ function combineTextFiles(inputFolder, outputFile, nameFilter) {
   let combinedData = "";
   let totalInputLines = 0;
 
-  const readPromises = textFiles.map((file) => {
-    return fs.promises
-      .readFile(file, "utf8")
-      .then((data) => {
-        const inputLines = data
-          .split("\n")
-          .filter((line) => line.trim() !== "").length;
-        totalInputLines += inputLines;
-        combinedData += data + "\n";
-      })
-      .catch((err) => {
-        console.error(`Error reading file ${file}: ${err}`);
-      });
-  });
+  for (const file of textFiles) {
+    try {
+      const data = await fs.promises.readFile(file, "utf8");
+      const inputLines = data
+        .split("\n")
+        .filter((line) => line.trim() !== "").length;
+      totalInputLines += inputLines;
 
-  Promise.all(readPromises)
-    .then(() => {
-      fs.writeFile(outputFile, combinedData, "utf8", (err) => {
-        if (err) {
-          console.error(`Error writing to file ${outputFile}: ${err}`);
-          return;
-        }
-        console.log(`Combined text file created at ${outputFile}`);
+      combinedData += data.endsWith("\n") ? data : data + "\n";
+    } catch (error) {
+      console.error(`Error reading file ${file}: ${error}`);
+    }
+  }
 
-        // Verify the line counts
-        const totalOutputLines = combinedData
-          .split("\n")
-          .filter((line) => line.trim() !== "").length;
-        if (totalInputLines === totalOutputLines) {
-          console.log(
-            `Line count verification passed: ${totalInputLines} lines.`
-          );
-        } else {
-          console.error(
-            `Line count verification failed: ${totalInputLines} input lines, but ${totalOutputLines} output lines.`
-          );
-        }
-      });
-    })
-    .catch((err) => {
-      console.error(`Error combining files: ${err}`);
-    });
+  try {
+    await fs.promises.writeFile(outputFile, combinedData, "utf8");
+    console.log(`Combined text file created at ${outputFile}`);
+
+    const totalOutputLines = combinedData
+      .split("\n")
+      .filter((line) => line.trim() !== "").length;
+    if (totalInputLines === totalOutputLines) {
+      console.log(`Line count verification passed: ${totalInputLines} lines.`);
+    } else {
+      console.error(
+        `Line count verification failed: ${totalInputLines} input lines, but ${totalOutputLines} output lines.`
+      );
+    }
+  } catch (error) {
+    console.error(`Error writing to file ${outputFile}: ${error}`);
+  }
 }
 
 combineTextFiles(inputFolder, outputFile, nameFilter);
