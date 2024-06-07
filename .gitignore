@@ -1,6 +1,6 @@
 # Elias Defined
 input/*
-
+*.csv
 
 # Logs
 logs
