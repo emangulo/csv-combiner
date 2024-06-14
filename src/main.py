@@ -1,9 +1,5 @@
 import os
 
-input_folder = "./input"
-name_filter = ""  # "" or JobFilters or Jobs
-output_file = f"./output/output-{name_filter}.csv"
-
 def get_all_files(dir_path):
     all_files = []
     for root, _, files in os.walk(dir_path):
@@ -46,4 +42,3 @@ def combine_text_files(input_folder, output_file, name_filter):
     except Exception as e:
         print(f'Error writing to file {output_file}: {e}')
 
-combine_text_files(input_folder, output_file, name_filter)
