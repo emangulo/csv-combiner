@@ -1,4 +1,3 @@
-import os
 from src.main import combine_text_files
 
 input_folder = "./input"
